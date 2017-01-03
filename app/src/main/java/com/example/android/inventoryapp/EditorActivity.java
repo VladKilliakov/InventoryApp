@@ -36,6 +36,7 @@ import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 
 /**
  * Allows user to create a new item or edit an existing one.
@@ -50,19 +51,29 @@ public class EditorActivity extends AppCompatActivity implements
 
     private static final String STATE_URI = "STATE_URI";
 
-    /** Identifier for the item data loader */
+    /**
+     * Identifier for the item data loader
+     */
     private static final int EXISTING_ITEM_LOADER = 0;
 
-    /** Content URI for the existing item (null if it's a new item) */
+    /**
+     * Content URI for the existing item (null if it's a new item)
+     */
     private Uri mCurrentItemUri;
 
-    /** EditText field to enter the item's name */
+    /**
+     * EditText field to enter the item's name
+     */
     private EditText mNameEditText;
 
-    /** EditText field to enter the item's price */
+    /**
+     * EditText field to enter the item's price
+     */
     private EditText mPriceEditText;
 
-    /** EditText field to enter the item's supplier */
+    /**
+     * EditText field to enter the item's supplier
+     */
     private EditText mSupplierEditText;
 
     private EditText mFactorEditText;
@@ -79,8 +90,12 @@ public class EditorActivity extends AppCompatActivity implements
 
     private Uri imageUri;
 
+    private Cursor generalCursor;
 
-    /** Boolean flag that keeps track of whether the item has been edited (true) or not (false) */
+
+    /**
+     * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
+     */
     private boolean mItemHasChanged = false;
 
     /**
@@ -123,6 +138,7 @@ public class EditorActivity extends AppCompatActivity implements
             getLoaderManager().initLoader(EXISTING_ITEM_LOADER, null, this);
         }
 
+
         // Find all relevant views that we will need to read user input from
         mNameEditText = (EditText) findViewById(R.id.edit_item_name);
         mPriceEditText = (EditText) findViewById(R.id.edit_item_price);
@@ -139,16 +155,16 @@ public class EditorActivity extends AppCompatActivity implements
         mQuantityTextView.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
 
-        if (mCurrentItemUri == null){
-        ViewTreeObserver viewTreeObserver = itemImageView.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                itemImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                itemImageView.setImageBitmap(getBitmapFromImageUri(imageUri));
-                Log.e(LOG_TAG, "onCreate method");
-            }
-        });}
+        if (mCurrentItemUri == null) {
+            ViewTreeObserver viewTreeObserver = itemImageView.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    itemImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    itemImageView.setImageBitmap(getBitmapFromImageUri(imageUri));
+                }
+            });
+        }
 
         addImageButton = (Button) findViewById(R.id.add_image_button);
         addImageButton.setOnClickListener(new View.OnClickListener() {
@@ -159,14 +175,14 @@ public class EditorActivity extends AppCompatActivity implements
         });
 
         orderMoreButton = (Button) findViewById(R.id.order_more_button);
-        orderMoreButton.setOnClickListener(new View.OnClickListener(){
+        orderMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendEmail();
             }
         });
 
-        if (TextUtils.isEmpty(mQuantityTextView.getText())){
+        if (TextUtils.isEmpty(mQuantityTextView.getText())) {
             itemQuantity = 0;
             mQuantityTextView.setText(String.valueOf(itemQuantity));
         }
@@ -177,24 +193,35 @@ public class EditorActivity extends AppCompatActivity implements
         decreaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (itemQuantity > 0){
-                    itemQuantity = itemQuantity -1;
+                if (!TextUtils.isEmpty(mFactorEditText.getText())) {
+                    factorNumber = Integer.valueOf(mFactorEditText.getText().toString().trim());
+                } else {
+                    factorNumber = 1;
+                }
+                if ((itemQuantity - factorNumber) >= 0) {
+                    itemQuantity = itemQuantity - factorNumber;
                     mQuantityTextView.setText(String.valueOf(itemQuantity));
                 }
-        }});
+            }
+        });
 
         increaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                itemQuantity = itemQuantity + 1;
+                if (!TextUtils.isEmpty(mFactorEditText.getText())) {
+                    factorNumber = Integer.valueOf(mFactorEditText.getText().toString().trim());
+                } else {
+                    factorNumber = 1;
+                }
+                itemQuantity = itemQuantity + factorNumber;
                 mQuantityTextView.setText(String.valueOf(itemQuantity));
-        }});
+            }
+        });
 
     }
 
-
     /**
-     * Get user input from editor and save item into database.
+     * Get user input from editor and save the item into database.
      */
     private void saveItem() {
         // Read from input fields
@@ -216,7 +243,7 @@ public class EditorActivity extends AppCompatActivity implements
             return;
         }
 
-        if (TextUtils.isEmpty(quantityString)){
+        if (TextUtils.isEmpty(quantityString)) {
             itemQuantity = 0;
         }
 
@@ -227,7 +254,10 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(ItemEntry.COLUMN_ITEM_PRICE, priceDouble);
         values.put(ItemEntry.COLUMN_ITEM_QUANTITY, itemQuantity);
         values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, supplierString);
-        values.put(ItemEntry.COLUMN_ITEM_IMAGE, imageUri.toString());
+
+        if (imageUri != null) {
+            values.put(ItemEntry.COLUMN_ITEM_IMAGE, imageUri.toString());
+        }
 
         // Determine if this is a new or existing item by checking if mCurrentItemUri is null or not
         if (mCurrentItemUri == null) {
@@ -294,12 +324,21 @@ public class EditorActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Save item to database
-                saveItem();
-                // Exit activity
-                finish();
-                return true;
-            // Respond to a click on the "Delete" menu option
+                //Input validation logic
+                if (TextUtils.isEmpty(mNameEditText.getText()) ||
+                        TextUtils.isEmpty(mPriceEditText.getText()) ||
+                        TextUtils.isEmpty(mSupplierEditText.getText())) {
+                    Toast.makeText(this,
+                            getString(R.string.input_validation), Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
+                    // Save item to database
+                    saveItem();
+                    // Exit activity
+                    finish();
+                    return true;
+                }
+                // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
                 // Pop up confirmation dialog for deletion
                 showDeleteConfirmationDialog();
@@ -332,9 +371,6 @@ public class EditorActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * This method is called when the back button is pressed.
-     */
     @Override
     public void onBackPressed() {
         // If the item hasn't changed, continue with handling back button press
@@ -368,7 +404,7 @@ public class EditorActivity extends AppCompatActivity implements
                 ItemEntry.COLUMN_ITEM_QUANTITY,
                 ItemEntry.COLUMN_ITEM_PRICE,
                 ItemEntry.COLUMN_ITEM_IMAGE,
-                ItemEntry.COLUMN_ITEM_SUPPLIER };
+                ItemEntry.COLUMN_ITEM_SUPPLIER};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -381,6 +417,8 @@ public class EditorActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        generalCursor = cursor;
+
         // Bail early if the cursor is null or there is less than 1 row in the cursor
         if (cursor == null || cursor.getCount() < 1) {
             return;
@@ -401,15 +439,24 @@ public class EditorActivity extends AppCompatActivity implements
             int quantity = cursor.getInt(quantityColumnIndex);
             double price = cursor.getDouble(priceColumnIndex);
             String supplier = cursor.getString(supplierColumnIndex);
-            String imageUriString = cursor.getString(imageColumnIndex);
+
+            String imageUriString = "";
+            if (cursor.getString(imageColumnIndex) != null) {
+                imageUriString = cursor.getString(imageColumnIndex);
+                imageUri = Uri.parse(imageUriString);
+            }
+
+            DecimalFormat priceFormat = new DecimalFormat("##.00");
+            String priceFormatted = priceFormat.format(price);
 
             // Update the views on the screen with the values from the database
             mNameEditText.setText(name);
-            mPriceEditText.setText(String.valueOf(price));
+            mPriceEditText.setText(priceFormatted);
             mQuantityTextView.setText(String.valueOf(quantity));
             mSupplierEditText.setText(supplier);
             itemImageView.setImageBitmap(getBitmapFromImageUri(Uri.parse(imageUriString)));
 
+            itemQuantity = quantity;
         }
     }
 
@@ -552,10 +599,7 @@ public class EditorActivity extends AppCompatActivity implements
             // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
 
             if (resultData != null) {
-                Log.e(LOG_TAG, "Entering onActivityResult method");
                 imageUri = resultData.getData();
-                Log.i(LOG_TAG, "Uri: " + imageUri.toString());
-
                 itemImageView.setImageBitmap(getBitmapFromImageUri(imageUri));
             }
         } else if (requestCode == SEND_MAIL_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -564,9 +608,6 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     public Bitmap getBitmapFromImageUri(Uri uri) {
-
-        Log.e("This Activity", "Uri value: " + String.valueOf(uri));
-
         if (uri == null || uri.toString().isEmpty()) return null;
 
         InputStream input = null;
@@ -598,45 +639,63 @@ public class EditorActivity extends AppCompatActivity implements
             try {
                 input.close();
             } catch (IOException ioe) {
-
             }
         }
     }
 
     private void sendEmail() {
-        if (imageUri != null) {
-            String subject = "URI Example";
-            String stream = "Hello! \n"
-                    + "Uri example" + ".\n"
-                    + "Uri: " + imageUri.toString() + "\n";
+        if (imageUri != null && generalCursor != null && generalCursor.getCount() >= 1) {
+            if (generalCursor.moveToFirst()) {
+                // Find the columns of item attributes that we're interested in
+                int nameColumnIndex = generalCursor.getColumnIndex(ItemEntry.COLUMN_ITEM_NAME);
+                int quantityColumnIndex = generalCursor.getColumnIndex(ItemEntry.COLUMN_ITEM_QUANTITY);
+                int priceColumnIndex = generalCursor.getColumnIndex(ItemEntry.COLUMN_ITEM_PRICE);
+                int supplierColumnIndex = generalCursor.getColumnIndex(ItemEntry.COLUMN_ITEM_SUPPLIER);
 
-            Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-                    .setStream(imageUri)
-                    .setSubject(subject)
-                    .setText(stream)
-                    .getIntent();
+                // Extract out the value from the Cursor for the given column index
+                String emailItemName = generalCursor.getString(nameColumnIndex);
+                String emailItemQuantity = String.valueOf(generalCursor.getInt(quantityColumnIndex));
+                String emailItemPrice = String.valueOf(generalCursor.getDouble(priceColumnIndex));
+                String emailItemSupplier = generalCursor.getString(supplierColumnIndex);
 
-            // Provide read access
-            shareIntent.setData(imageUri);
-            shareIntent.setType("message/rfc822");
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                String subject = getString(R.string.email_title);
+                String stream = getString(R.string.hello) +
+                        getString(R.string.current_item_name) + emailItemName +
+                        getString(R.string.current_item_quantity) + emailItemQuantity +
+                        getString(R.string.current_item_price) + "$" + emailItemPrice;
 
-            if (Build.VERSION.SDK_INT < 21) {
-                shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            } else {
-                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                        .setStream(imageUri)
+                        .setSubject(subject)
+                        .setText(stream)
+                        .getIntent();
+
+                // Provide read access
+                shareIntent.setData(imageUri);
+                shareIntent.setType("message/rfc822");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                shareIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{emailItemSupplier});
+
+                if (Build.VERSION.SDK_INT < 21) {
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                } else {
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                }
+
+                startActivityForResult(Intent.createChooser(shareIntent,
+                        getString(R.string.share_with)), SEND_MAIL_REQUEST);
             }
-
-            startActivityForResult(Intent.createChooser(shareIntent, "Share with"), SEND_MAIL_REQUEST);
-
-        } else {
-            Snackbar.make(addImageButton, "Image not selected", Snackbar.LENGTH_LONG)
-                    .setAction("Select", new View.OnClickListener() {
+        } else if (imageUri == null) {
+            Snackbar.make(addImageButton, R.string.email_image_warning, Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.select), new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             openImageSelector();
                         }
                     }).show();
+        } else if (generalCursor == null || generalCursor.getCount() < 1) {
+            Toast.makeText(this, getString(R.string.email_data_warning),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 }

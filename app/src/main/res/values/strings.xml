@@ -72,7 +72,7 @@
     <string name="hint_item_price">Enter price of the item</string>
 
     <string name="category_quantity">Quantity</string>
-    <string name="units">Units</string>
+    <string name="units">\u0020Units</string>
     <string name="order_more">Order more</string>
     <string name="sell">Sell</string>
     <string name="increment_decrement_factor">Incr./decr.:</string>
@@ -81,5 +81,15 @@
     <string name="image_preview">Image preview:</string>
     <string name="supplier">Supplier</string>
     <string name="hint_item_supplier">Enter email of the supplier</string>
+    <string name="email_title">New order</string>
+    <string name="hello">Order details:\n\n</string>
+    <string name="current_item_name">Item name:\u0020</string>
+    <string name="current_item_quantity">\nCurrent quantity:\u0020</string>
+    <string name="current_item_price">\nPrice:\u0020</string>
+    <string name="share_with">Share with</string>
+    <string name="email_image_warning">Please select the image</string>
+    <string name="email_data_warning">Please enter item name and price first, and then save it.</string>
+    <string name="input_validation">Plase provide valid inputs for item name, price and supplier.</string>
+    <string name="select">Select</string>
 
 </resources>

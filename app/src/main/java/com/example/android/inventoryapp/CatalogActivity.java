@@ -2,7 +2,6 @@ package com.example.android.inventoryapp;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -11,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,33 +88,10 @@ public class CatalogActivity extends AppCompatActivity implements
     }
 
     /**
-     * Helper method to insert hardcoded item data into the database. For debugging purposes only.
-     */
-    private void insertItem() {
-        // Create a ContentValues object where column names are the keys,
-        // and Toto's item attributes are the values.
-        ContentValues values = new ContentValues();
-        values.put(ItemEntry.COLUMN_ITEM_NAME, "Nike shoes");
-        values.put(ItemEntry.COLUMN_ITEM_QUANTITY, 12);
-        values.put(ItemEntry.COLUMN_ITEM_PRICE, 49.99);
-        values.put(ItemEntry.COLUMN_ITEM_IMAGE,
-                "content://com.android.providers.media.documents/document/image%3A10972");
-        values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, "supplier@gmail.com");
-
-
-        // Insert a new row for Toto into the provider using the ContentResolver.
-        // Use the {@link ItemEntry#CONTENT_URI} to indicate that we want to insert
-        // into the items database table.
-        // Receive the new content URI that will allow us to access Toto's data in the future.
-        Uri newUri = getContentResolver().insert(ItemEntry.CONTENT_URI, values);
-    }
-
-    /**
      * Helper method to delete all items in the database.
      */
     private void deleteAllItems() {
         int rowsDeleted = getContentResolver().delete(ItemEntry.CONTENT_URI, null, null);
-        Log.v("CatalogActivity", rowsDeleted + " rows deleted from item database");
     }
 
     @Override
@@ -131,10 +106,6 @@ public class CatalogActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
-            // Respond to a click on the "Insert dummy data" menu option
-            case R.id.insert_dummy_data:
-                insertItem();
-                return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
                 deleteAllItems();
@@ -150,7 +121,9 @@ public class CatalogActivity extends AppCompatActivity implements
                 ItemEntry._ID,
                 ItemEntry.COLUMN_ITEM_NAME,
                 ItemEntry.COLUMN_ITEM_QUANTITY,
-                ItemEntry.COLUMN_ITEM_PRICE};
+                ItemEntry.COLUMN_ITEM_PRICE,
+                ItemEntry.COLUMN_ITEM_IMAGE,
+                ItemEntry.COLUMN_ITEM_SUPPLIER};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context

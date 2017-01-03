@@ -10,7 +10,8 @@ public final class ItemContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_ITEMS = "items";
 
-    private ItemContract(){}
+    private ItemContract() {
+    }
 
     public static abstract class ItemEntry implements BaseColumns {
 

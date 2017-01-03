@@ -6,31 +6,32 @@
 
     <Space
         android:id="@+id/divider"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_width="10dp"
-        android:layout_height="0dp" />
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
     <Button
         android:id="@+id/order_more_button"
         style="@style/EditorButtons"
         android:layout_toRightOf="@id/divider"
         android:text="@string/order_more" />
+
     <Button
         android:id="@+id/add_image_button"
         style="@style/EditorButtons"
         android:layout_toLeftOf="@id/divider"
-        android:text="@string/add_image"
-        />
+        android:text="@string/add_image" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical"
         android:padding="@dimen/activity_margin"
-        tools:context=".EditorActivity"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        tools:context=".EditorActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,12 +83,13 @@
                 <TextView
                     android:id="@+id/label_currency"
                     style="@style/EditorUnitsStyle"
-                    tools:text="$" />
+                    android:text="$" />
+
                 <EditText
                     android:id="@+id/edit_item_price"
                     style="@style/EditorFieldStyle"
-                    android:hint="@string/hint_item_price"
                     android:layout_toLeftOf="@id/label_currency"
+                    android:hint="@string/hint_item_price"
                     android:inputType="numberDecimal" />
 
             </RelativeLayout>
@@ -122,11 +124,11 @@
                     android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:gravity="center"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
                     android:layout_toRightOf="@id/decrease_quantity"
                     android:fontFamily="sans-serif-light"
+                    android:gravity="center"
                     android:textAppearance="?android:textAppearanceMedium"
                     tools:text="63" />
 
@@ -154,9 +156,9 @@
 
             <!-- Label -->
             <TextView
+                android:id="@+id/textView"
                 style="@style/CategoryStyle"
-                android:text="@string/supplier"
-                android:id="@+id/textView" />
+                android:text="@string/supplier" />
 
             <!-- Input fields -->
             <LinearLayout
@@ -170,8 +172,8 @@
                 <EditText
                     android:id="@+id/edit_supplier"
                     style="@style/EditorFieldStyle"
-                    android:hint="@string/hint_item_supplier"
                     android:ellipsize="end"
+                    android:hint="@string/hint_item_supplier"
                     android:inputType="textCapWords" />
 
             </LinearLayout>
@@ -191,10 +193,10 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:layout_marginLeft="4dp"
                 android:id="@+id/edit_inc_decr"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
                 android:layout_weight="2"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-light"
@@ -204,21 +206,22 @@
         </LinearLayout>
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp"
             android:fontFamily="sans-serif"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textStyle="bold"
             android:text="@string/image_preview"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textStyle="bold" />
+
         <ImageView
             android:id="@+id/item_image"
-            android:layout_marginTop="12dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="centerCrop"
             android:layout_width="150dp"
-            android:layout_height="150dp" />
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop" />
 
     </LinearLayout>
 </RelativeLayout>
