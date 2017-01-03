@@ -99,7 +99,10 @@ public class CatalogActivity extends AppCompatActivity implements
         values.put(ItemEntry.COLUMN_ITEM_NAME, "Nike shoes");
         values.put(ItemEntry.COLUMN_ITEM_QUANTITY, 12);
         values.put(ItemEntry.COLUMN_ITEM_PRICE, 49.99);
+        values.put(ItemEntry.COLUMN_ITEM_IMAGE,
+                "content://com.android.providers.media.documents/document/image%3A10972");
         values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, "supplier@gmail.com");
+
 
         // Insert a new row for Toto into the provider using the ContentResolver.
         // Use the {@link ItemEntry#CONTENT_URI} to indicate that we want to insert

@@ -25,18 +25,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
-
-import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -144,14 +139,16 @@ public class EditorActivity extends AppCompatActivity implements
         mQuantityTextView.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
 
+        if (mCurrentItemUri == null){
         ViewTreeObserver viewTreeObserver = itemImageView.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 itemImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                itemImageView.setImageBitmap(getBitmapFroimageUri(imageUri));
+                itemImageView.setImageBitmap(getBitmapFromImageUri(imageUri));
+                Log.e(LOG_TAG, "onCreate method");
             }
-        });
+        });}
 
         addImageButton = (Button) findViewById(R.id.add_image_button);
         addImageButton.setOnClickListener(new View.OnClickListener() {
@@ -227,7 +224,7 @@ public class EditorActivity extends AppCompatActivity implements
         // and item attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(ItemEntry.COLUMN_ITEM_NAME, nameString);
-        values.put(ItemEntry.COLUMN_ITEM_PRICE, priceString);
+        values.put(ItemEntry.COLUMN_ITEM_PRICE, priceDouble);
         values.put(ItemEntry.COLUMN_ITEM_QUANTITY, itemQuantity);
         values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, supplierString);
         values.put(ItemEntry.COLUMN_ITEM_IMAGE, imageUri.toString());
@@ -403,7 +400,6 @@ public class EditorActivity extends AppCompatActivity implements
             String name = cursor.getString(nameColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
             double price = cursor.getDouble(priceColumnIndex);
-            String image = cursor.getString(imageColumnIndex);
             String supplier = cursor.getString(supplierColumnIndex);
             String imageUriString = cursor.getString(imageColumnIndex);
 
@@ -412,7 +408,7 @@ public class EditorActivity extends AppCompatActivity implements
             mPriceEditText.setText(String.valueOf(price));
             mQuantityTextView.setText(String.valueOf(quantity));
             mSupplierEditText.setText(supplier);
-            itemImageView.setImageBitmap(getBitmapFroimageUri(Uri.parse(imageUriString)));
+            itemImageView.setImageBitmap(getBitmapFromImageUri(Uri.parse(imageUriString)));
 
         }
     }
@@ -556,17 +552,20 @@ public class EditorActivity extends AppCompatActivity implements
             // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
 
             if (resultData != null) {
+                Log.e(LOG_TAG, "Entering onActivityResult method");
                 imageUri = resultData.getData();
                 Log.i(LOG_TAG, "Uri: " + imageUri.toString());
 
-                itemImageView.setImageBitmap(getBitmapFroimageUri(imageUri));
+                itemImageView.setImageBitmap(getBitmapFromImageUri(imageUri));
             }
         } else if (requestCode == SEND_MAIL_REQUEST && resultCode == Activity.RESULT_OK) {
 
         }
     }
 
-    public Bitmap getBitmapFroimageUri(Uri uri) {
+    public Bitmap getBitmapFromImageUri(Uri uri) {
+
+        Log.e("This Activity", "Uri value: " + String.valueOf(uri));
 
         if (uri == null || uri.toString().isEmpty()) return null;
 

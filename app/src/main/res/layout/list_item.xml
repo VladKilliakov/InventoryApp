@@ -14,7 +14,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
+        android:layout_weight="2"
         android:orientation="vertical"
         android:padding="@dimen/activity_margin">
 
@@ -49,22 +49,25 @@
         <Button
             android:id="@+id/sell_button"
             android:layout_width="60dp"
+            android:focusable="false"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="12dp"
             android:text="@string/sell" />
+
         <TextView
             android:id="@+id/item_price"
-            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="12dp"
-            android:layout_toLeftOf="@id/sell_button"
             android:fontFamily="sans-serif-medium"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceSmall"
             android:textColor="#2B3D4D"
-            tools:text="$49" />
+            tools:text="$49.99"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/sell_button"
+            android:layout_toStartOf="@+id/sell_button" />
 
 
     </RelativeLayout>

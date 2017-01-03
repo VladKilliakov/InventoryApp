@@ -2,20 +2,23 @@ package com.example.android.inventoryapp;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
 import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
+import com.example.android.inventoryapp.EditorActivity;
 
 import java.util.Locale;
 import java.util.Currency;
+
+import static android.os.Build.VERSION_CODES.M;
 
 /**
  * {@link ItemCursorAdapter} is an adapter for a list or grid view
@@ -65,6 +68,9 @@ public class ItemCursorAdapter extends CursorAdapter {
         TextView nameTextView = (TextView) view.findViewById(R.id.item_name);
         TextView quantityTextView = (TextView) view.findViewById(R.id.item_quantity);
         TextView priceTextView = (TextView) view.findViewById(R.id.item_price);
+        ImageView imageView = (ImageView) view.findViewById(R.id.item_image);
+
+        nameTextView.setSelected(true);
 
         Button sellButton = (Button) view.findViewById(R.id.sell_button);
 
@@ -83,17 +89,26 @@ public class ItemCursorAdapter extends CursorAdapter {
         int nameColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_NAME);
         int quantityColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_QUANTITY);
         int priceColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_PRICE);
+        int imageColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_IMAGE);
+        int supplierColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_SUPPLIER);
 
         // Read the item attributes from the Cursor for the current item
         String itemName = cursor.getString(nameColumnIndex);
         int itemQuantity = cursor.getInt(quantityColumnIndex);
         Double itemPrice = cursor.getDouble(priceColumnIndex);
+        String itemImage = cursor.getString(imageColumnIndex);
+        String itemSupplier = cursor.getString(supplierColumnIndex);
+
+        EditorActivity editorActivity = new EditorActivity();
+
+//        Bitmap imageBitmap = editorActivity.getBitmapFromImageUri(Uri.parse(itemImage));
+//        imageView.setImageBitmap(imageBitmap);
 
         String price = Currency.getInstance(Locale.getDefault()).getSymbol() + String.valueOf(itemPrice);
 
         // Update the TextViews with the attributes for the current item
         nameTextView.setText(itemName);
-        quantityTextView.setText(itemQuantity);
+        quantityTextView.setText(String.valueOf(itemQuantity));
         priceTextView.setText(price);
         }
     }
