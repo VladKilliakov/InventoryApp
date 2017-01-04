@@ -230,22 +230,8 @@ public class EditorActivity extends AppCompatActivity implements
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityTextView.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
-
-        if (priceString.contains(",")) {
-            priceString = priceString.replace(",", ".");
-        }
         double priceDouble = Double.valueOf(mPriceEditText.getText().toString());
 
-
-        // Check if this is supposed to be a new item
-        // and check if all the fields in the editor are blank
-        if (mCurrentItemUri == null &&
-                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(priceString) &&
-                TextUtils.isEmpty(supplierString) && TextUtils.isEmpty(quantityString)) {
-            // Since no fields were modified, we can return early without creating a new item.
-            // No need to create ContentValues and no need to do any ContentProvider operations.
-            return;
-        }
 
         if (TextUtils.isEmpty(quantityString)) {
             itemQuantity = 0;
@@ -332,6 +318,7 @@ public class EditorActivity extends AppCompatActivity implements
                 DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                 String priceString = mPriceEditText.getText().toString().trim();
                 String formattedPrice = "";
+
                 if (priceString.contains(",")) {
                     priceString = priceString.replace(",", ".");
                 }
