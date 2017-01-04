@@ -30,9 +30,7 @@ import static com.example.android.inventoryapp.data.ItemContract.ItemEntry.COLUM
  */
 public class ItemCursorAdapter extends CursorAdapter {
 
-    private static final String LOG_TAG = EditorActivity.class.getSimpleName();
-    private Context generalContext;
-    private Cursor generalCursor;
+    Cursor generalCursor;
 
     /**
      * Constructs a new {@link ItemCursorAdapter}.
@@ -55,6 +53,7 @@ public class ItemCursorAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        generalCursor = cursor;
         // Most recent code version
         // Inflate a list item view using the layout specified in list_item.xml
         return LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
@@ -72,8 +71,6 @@ public class ItemCursorAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
-        generalContext = context;
-        generalCursor = cursor;
 
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.item_name);
@@ -83,30 +80,37 @@ public class ItemCursorAdapter extends CursorAdapter {
 
         nameTextView.setSelected(true);
 
-        Button sellButton = (Button) view.findViewById(R.id.sell_button);
+        final int position = cursor.getPosition();
 
+        Button sellButton = (Button) view.findViewById(R.id.sell_button);
         sellButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String quantityString = quantityTextView.getText().toString().trim();
                 String[] quantityList = quantityString.split(" ");
-                int quantityInt = Integer.parseInt(quantityList[0].trim());
+                int quantityInt = Integer.parseInt(quantityList[0]);
 
                 if (quantityInt > 0) {
-                    // Request data base and decrease quantity by 1
+                    // Request data from the database and decrease quantity by 1
                     quantityInt = quantityInt - 1;
 
-                    int quantityIdColumnIndex = cursor.getColumnIndex(ItemEntry._ID);
-                    final long itemId = cursor.getLong(quantityIdColumnIndex);
-                    Uri mCurrentItemUri = ContentUris.withAppendedId(ItemEntry.CONTENT_URI, itemId);
+                    cursor.moveToPosition(position);
+                    int idColumnIndex = cursor.getColumnIndex(ItemEntry._ID);
+                    long itemId = cursor.getLong(idColumnIndex);
 
+                    Uri mCurrentItemUri;
+                    if (cursor.getCount() > 1) {
+                        mCurrentItemUri = ContentUris.withAppendedId(ItemEntry.CONTENT_URI, itemId);
+                    } else {
+                        mCurrentItemUri = ContentUris.withAppendedId(ItemEntry.CONTENT_URI,
+                                itemId - cursor.getCount() + 1);
+                    }
                     // Defines an object to contain the updated values
                     ContentValues values = new ContentValues();
                     values.put(ItemEntry.COLUMN_ITEM_QUANTITY, quantityInt);
 
-                    quantityTextView.setText(String.valueOf(quantityInt));
-
                     int rowsUpdate = context.getContentResolver().update(mCurrentItemUri, values, null, null);
+                    quantityTextView.setText(String.valueOf(quantityInt));
                 }
             }
         });
@@ -129,7 +133,7 @@ public class ItemCursorAdapter extends CursorAdapter {
             imageView.setImageResource(R.drawable.no_image);
         }
 
-        DecimalFormat priceFormat = new DecimalFormat("##.00");
+        DecimalFormat priceFormat = new DecimalFormat("#0.00");
         String priceFormatted = priceFormat.format(itemPrice);
         String fullPrice = Currency.getInstance(Locale.getDefault()).getSymbol() + priceFormatted;
 

@@ -9,8 +9,6 @@ import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
 
 public class ItemDbHelper extends SQLiteOpenHelper {
 
-    public static final String LOG_TAG = ItemDbHelper.class.getSimpleName();
-
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "shelter.db";
 

@@ -230,6 +230,10 @@ public class EditorActivity extends AppCompatActivity implements
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityTextView.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
+
+        if (priceString.contains(",")) {
+            priceString = priceString.replace(",", ".");
+        }
         double priceDouble = Double.valueOf(mPriceEditText.getText().toString());
 
 
@@ -325,9 +329,17 @@ public class EditorActivity extends AppCompatActivity implements
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 //Input validation logic
+                DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                String priceString = mPriceEditText.getText().toString().trim();
+                if (priceString.contains(",")) {
+                    priceString = priceString.replace(",", ".");
+                }
+                String formattedPrice = decimalFormat.format(Double.valueOf(priceString));
+
                 if (TextUtils.isEmpty(mNameEditText.getText()) ||
                         TextUtils.isEmpty(mPriceEditText.getText()) ||
-                        TextUtils.isEmpty(mSupplierEditText.getText())) {
+                        TextUtils.isEmpty(mSupplierEditText.getText()) ||
+                        formattedPrice.equals("0.00")) {
                     Toast.makeText(this,
                             getString(R.string.input_validation), Toast.LENGTH_SHORT).show();
                     return true;
@@ -446,7 +458,7 @@ public class EditorActivity extends AppCompatActivity implements
                 imageUri = Uri.parse(imageUriString);
             }
 
-            DecimalFormat priceFormat = new DecimalFormat("##.00");
+            DecimalFormat priceFormat = new DecimalFormat("#0.00");
             String priceFormatted = priceFormat.format(price);
 
             // Update the views on the screen with the values from the database
