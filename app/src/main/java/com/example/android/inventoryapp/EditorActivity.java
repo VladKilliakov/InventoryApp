@@ -331,15 +331,19 @@ public class EditorActivity extends AppCompatActivity implements
                 //Input validation logic
                 DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                 String priceString = mPriceEditText.getText().toString().trim();
+                String formattedPrice = "";
                 if (priceString.contains(",")) {
                     priceString = priceString.replace(",", ".");
                 }
-                String formattedPrice = decimalFormat.format(Double.valueOf(priceString));
 
-                if (TextUtils.isEmpty(mNameEditText.getText()) ||
-                        TextUtils.isEmpty(mPriceEditText.getText()) ||
-                        TextUtils.isEmpty(mSupplierEditText.getText()) ||
-                        formattedPrice.equals("0.00")) {
+                if(!TextUtils.isEmpty(priceString)){
+                    formattedPrice = decimalFormat.format(Double.valueOf(priceString));
+                }
+
+                if (TextUtils.isEmpty(mNameEditText.getText().toString().trim()) ||
+                        TextUtils.isEmpty(priceString) ||
+                        TextUtils.isEmpty(mSupplierEditText.getText().toString().trim()) ||
+                        formattedPrice.equals("0.00")){
                     Toast.makeText(this,
                             getString(R.string.input_validation), Toast.LENGTH_SHORT).show();
                     return true;
